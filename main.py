@@ -4,6 +4,28 @@ from rapidfuzz import fuzz
 import streamlit as st
 
 # =========================
+# 🎨 CUSTOM UI STYLING
+# =========================
+st.set_page_config(page_title="Intercompany Reconciliation", layout="wide")
+
+st.markdown("""
+<style>
+.main {
+    background-color: #f5f7fa;
+}
+h1 {
+    color: #1f4e79;
+}
+.stMetric {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.05);
+}
+</style>
+""", unsafe_allow_html=True)
+
+# =========================
 # CONFIG
 # =========================
 TOLERANCE = 5
@@ -41,7 +63,7 @@ def preprocess(df):
     })
 
 # =========================
-# ORIGINAL RECONCILIATION (UNCHANGED LOGIC)
+# RECONCILIATION (UNCHANGED)
 # =========================
 def reconcile(df_a, df_b):
     merged = df_a.merge(
@@ -81,7 +103,7 @@ def reconcile(df_a, df_b):
     return merged
 
 # =========================
-# 🔥 FUZZY MATCHING (ADDED)
+# FUZZY MATCHING (UNCHANGED)
 # =========================
 def fuzzy_match(df_a, df_b, threshold=85):
     matches = []
@@ -107,7 +129,7 @@ def fuzzy_match(df_a, df_b, threshold=85):
     return pd.DataFrame(matches)
 
 # =========================
-# 🎨 EXCEL HIGHLIGHTING (ADDED)
+# EXCEL HIGHLIGHT (UNCHANGED)
 # =========================
 def highlight_excel(df, output_file):
     def highlight_status(row):
@@ -121,64 +143,78 @@ def highlight_excel(df, output_file):
             return [""] * len(row)
 
     styled = df.style.apply(highlight_status, axis=1)
-
     styled.to_excel(output_file, engine="openpyxl", index=False)
 
 # =========================
-# 📊 SUMMARY
-# =========================
-def generate_summary(df):
-    return df["Status"].value_counts()
-
-# =========================
-# 🌐 STREAMLIT UI (ADDED)
+# STREAMLIT UI (PRO VERSION)
 # =========================
 def run_streamlit():
-    st.title("💼 Intercompany Reconciliation Tool")
 
-    file_a = st.file_uploader("Upload Company A File", type=["xlsx"])
-    file_b = st.file_uploader("Upload Company B File", type=["xlsx"])
+    st.title("💼 Intercompany Reconciliation Dashboard")
+    st.caption("Smart Matching | Automated Analysis | Audit Ready")
+
+    # Sidebar
+    st.sidebar.header("⚙️ Settings")
+    threshold = st.sidebar.slider("Fuzzy Matching Threshold", 70, 100, 85)
+
+    file_a = st.sidebar.file_uploader("Upload Company A File", type=["xlsx"])
+    file_b = st.sidebar.file_uploader("Upload Company B File", type=["xlsx"])
 
     if file_a and file_b:
+
         df_a = pd.read_excel(file_a)
         df_b = pd.read_excel(file_b)
 
-        st.write("Preprocessing...")
         df_a_clean = preprocess(df_a)
         df_b_clean = preprocess(df_b)
 
-        st.write("Reconciling...")
         result = reconcile(df_a_clean, df_b_clean)
 
-        st.write("### 🔍 Summary")
-        st.write(generate_summary(result))
+        # =========================
+        # 📊 KPI METRICS
+        # =========================
+        summary = result["Status"].value_counts()
 
-        st.write("### 📄 Preview")
-        st.dataframe(result.head(50))
+        col1, col2, col3, col4 = st.columns(4)
 
-        # Fuzzy matches
-        st.write("### 🤖 Fuzzy Matches")
-        fuzzy_df = fuzzy_match(df_a_clean, df_b_clean)
-        st.dataframe(fuzzy_df.head(20))
+        col1.metric("✅ Matched", int(summary.get("MATCHED", 0)))
+        col2.metric("⚠️ Mismatch", int(summary.get("AMOUNT MISMATCH", 0)))
+        col3.metric("❌ Missing A", int(summary.get("MISSING IN A", 0)))
+        col4.metric("❌ Missing B", int(summary.get("MISSING IN B", 0)))
 
-        # Save Excel
+        st.divider()
+
+        # =========================
+        # 📑 TABS
+        # =========================
+        tab1, tab2, tab3 = st.tabs(["📄 Full Data", "❌ Issues", "🤖 Fuzzy Matches"])
+
+        # Full Data
+        with tab1:
+            st.dataframe(result, use_container_width=True)
+
+        # Issues Only
+        with tab2:
+            issues = result[result["Status"] != "MATCHED"]
+            st.dataframe(issues, use_container_width=True)
+
+        # Fuzzy Matches
+        with tab3:
+            fuzzy_df = fuzzy_match(df_a_clean, df_b_clean, threshold)
+            st.dataframe(fuzzy_df, use_container_width=True)
+
+        # =========================
+        # 📥 DOWNLOAD
+        # =========================
         output_file = "reconciliation_output.xlsx"
         highlight_excel(result, output_file)
 
         with open(output_file, "rb") as f:
             st.download_button(
-                label="📥 Download Excel Report",
+                label="📥 Download Styled Excel Report",
                 data=f,
-                file_name=output_file,
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                file_name=output_file
             )
-
-# =========================
-# MAIN (CLI MODE)
-# =========================
-def main():
-    print("Run using Streamlit:")
-    print("👉 streamlit run your_script.py")
 
 # =========================
 # RUN
