@@ -155,7 +155,7 @@ def run_streamlit():
 
     # Sidebar
     st.sidebar.header("⚙️ Settings")
-    threshold = st.sidebar.slider("Fuzzy Matching Threshold", 70, 100, 85)
+    #threshold = st.sidebar.slider("Fuzzy Matching Threshold", 70, 100, 85)
 
     file_a = st.sidebar.file_uploader("Upload Company A File", type=["xlsx"])
     file_b = st.sidebar.file_uploader("Upload Company B File", type=["xlsx"])
