@@ -192,13 +192,13 @@ def run_streamlit():
             status = str(row.get("Status", ""))
             if status == "MATCHED":
                 # Green background, dark green text
-                return ['background-color: rgba(34, 197, 94, 0.2); color: #166534; font-weight: 500;'] * len(row)
+                return ['background-color: rgba(34, 197, 94, 0.2); color: #49c979; font-weight: 500;'] * len(row)
             elif status == "AMOUNT MISMATCH":
                 # Orange background, dark orange text
-                return ['background-color: rgba(249, 115, 22, 0.2); color: #9A3412; font-weight: 500;'] * len(row)
+                return ['background-color: rgba(249, 115, 22, 0.2); color: #ff6229; font-weight: 500;'] * len(row)
             elif "MISSING" in status:
                 # Red background, dark red text (for Missing in A/B)
-                return ['background-color: rgba(239, 68, 68, 0.2); color: #991B1B; font-weight: 500;'] * len(row)
+                return ['background-color: rgba(239, 68, 68, 0.2); color: #fab9b9; font-weight: 500;'] * len(row)
             return [''] * len(row)
 
         # =========================
