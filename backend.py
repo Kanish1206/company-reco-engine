@@ -121,3 +121,45 @@ def highlight_excel(df, output_file):
 
     styled = df.style.apply(highlight_status, axis=1)
     styled.to_excel(output_file, engine="openpyxl", index=False)
+if __name__ == "__main__":
+    # 1. Load the Data
+    # Replace these filenames with the actual names of your uploaded files
+    file_a_path = "dataset_A.xlsx" 
+    file_b_path = "dataset_B.xlsx"
+    
+    df_a_raw = pd.read_excel(file_a_path)
+    df_b_raw = pd.read_excel(file_b_path)
+
+    # 2. Standardize Dates (CRITICAL for the merge to work)
+    # This strips away weird time formats and forces standard dates
+    df_a_raw["Reference Document Date"] = pd.to_datetime(df_a_raw["Reference Document Date"]).dt.date
+    df_b_raw["Reference Document Date"] = pd.to_datetime(df_b_raw["Reference Document Date"]).dt.date
+
+    # 3. Preprocess both files
+    df_a_clean = preprocess(df_a_raw)
+    df_b_clean = preprocess(df_b_raw)
+
+    # 4. Run Reconciliation
+    final_reconciliation = reconcile(df_a_clean, df_b_clean)
+
+    # 5. Run Fuzzy Matching on the "Missing" records
+    missing_in_a = final_reconciliation[final_reconciliation["Status"] == "MISSING IN A"].copy()
+    missing_in_b = final_reconciliation[final_reconciliation["Status"] == "MISSING IN B"].copy()
+    
+    # We rename columns temporarily so the fuzzy matcher can read them correctly
+    missing_in_a.rename(columns={"Reference_B": "Reference", "doc_norm": "doc_norm"}, inplace=True)
+    missing_in_b.rename(columns={"Reference_A": "Reference", "doc_norm": "doc_norm"}, inplace=True)
+
+    if not missing_in_a.empty and not missing_in_b.empty:
+        print("Running Fuzzy Match on unmatched records...")
+        fuzzy_results = fuzzy_match(missing_in_a, missing_in_b, threshold=85)
+        print("Fuzzy Match Results:")
+        print(fuzzy_results)
+        
+        # Optional: Save fuzzy matches to a separate CSV/Excel if needed
+        # fuzzy_results.to_excel("fuzzy_matches.xlsx", index=False)
+
+    # 6. Export the Highlighted Excel
+    output_filename = "Reconciliation_Results.xlsx"
+    highlight_excel(final_reconciliation, output_filename)
+    print(f"Reconciliation complete! File saved as: {output_filename}")
