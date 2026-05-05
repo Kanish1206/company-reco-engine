@@ -130,10 +130,10 @@ def run_streamlit():
     st.write("---")
 
     # Sidebar (Now only for Settings)
-    with st.sidebar:
-        st.header("⚙️ Configuration")
-        st.markdown("Adjust your matching parameters below.")
-        threshold = st.slider("Fuzzy Matching Threshold", 70, 100, 85, help="Higher values require stricter text matches.")
+    #with st.sidebar:
+        #st.header("⚙️ Configuration")
+        #st.markdown("Adjust your matching parameters below.")
+        #threshold = st.slider("Fuzzy Matching Threshold", 70, 100, 85, help="Higher values require stricter text matches.")
 
     # Main Area: File Uploaders Side-by-Side
     st.markdown("### 📥 Upload Datasets")
