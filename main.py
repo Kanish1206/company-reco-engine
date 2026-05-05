@@ -118,7 +118,7 @@ h1 {
 def run_streamlit():
 
     # Header Section
-    st.title("⚡ Recon-X Dashboard")
+    st.title("⚡🔁 Recon-X Dashboard")
     st.markdown("##### *Smart Matching • Audit Ready*")
     st.write("---")
 
