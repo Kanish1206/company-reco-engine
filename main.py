@@ -186,6 +186,22 @@ def run_streamlit():
         st.write("---")
 
         # =========================
+        # 🎨 DATAFRAME STYLING FUNCTION
+        # =========================
+        def highlight_status(row):
+            status = str(row.get("Status", ""))
+            if status == "MATCHED":
+                # Green background, dark green text
+                return ['background-color: rgba(34, 197, 94, 0.2); color: #166534; font-weight: 500;'] * len(row)
+            elif status == "AMOUNT MISMATCH":
+                # Orange background, dark orange text
+                return ['background-color: rgba(249, 115, 22, 0.2); color: #9A3412; font-weight: 500;'] * len(row)
+            elif "MISSING" in status:
+                # Red background, dark red text (for Missing in A/B)
+                return ['background-color: rgba(239, 68, 68, 0.2); color: #991B1B; font-weight: 500;'] * len(row)
+            return [''] * len(row)
+
+        # =========================
         # 📑 TABS
         # =========================
         tab1, tab2, tab3 = st.tabs(["📄 Full Data", "⚠️ Discrepancies", "🤖 Fuzzy Matches"])
@@ -193,7 +209,8 @@ def run_streamlit():
         # Full Data
         with tab1:
             st.markdown("### Complete Reconciliation Ledger")
-            st.dataframe(result, use_container_width=True, height=450)
+            styled_result = result.style.apply(highlight_status, axis=1)
+            st.dataframe(styled_result, use_container_width=True, height=450)
 
         # Issues Only
         with tab2:
@@ -202,7 +219,8 @@ def run_streamlit():
             if issues.empty:
                 st.success("✨ **Perfect Match!** No issues found in the datasets.")
             else:
-                st.dataframe(issues, use_container_width=True, height=450)
+                styled_issues = issues.style.apply(highlight_status, axis=1)
+                st.dataframe(styled_issues, use_container_width=True, height=450)
 
         # Fuzzy Matches
         with tab3:
