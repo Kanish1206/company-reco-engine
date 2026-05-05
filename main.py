@@ -10,13 +10,13 @@ st.set_page_config(page_title="Intercompany Reconciliation", page_icon="⚡", la
 
 st.markdown("""
 <style>
-/* 1. Global Background & Font */
+/* Global Background & Font */
 .stApp {
     background-color: #f4f7f6;
     font-family: 'Inter', sans-serif;
 }
 
-/* 2. Staggered Fade-In & Slide-Up Animations */
+/* Staggered Fade-In & Slide-Up Animations */
 @keyframes slideUpFade {
     0% { opacity: 0; transform: translateY(30px); }
     100% { opacity: 1; transform: translateY(0); }
@@ -34,7 +34,7 @@ st.markdown("""
 .main .block-container > div:nth-child(4) { animation-delay: 0.4s; }
 .main .block-container > div:nth-child(5) { animation-delay: 0.5s; }
 
-/* 3. Animated Shimmer Gradient Header */
+/* Animated Shimmer Gradient Header */
 @keyframes gradientShimmer {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -50,7 +50,7 @@ h1 {
     letter-spacing: -1px;
 }
 
-/* 4. Glassmorphism Metric Cards */
+/* Glassmorphism Metric Cards */
 [data-testid="stMetric"] {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(10px);
@@ -68,7 +68,7 @@ h1 {
     border-left: 5px solid #06B6D4;
 }
 
-/* 5. Sleek Tabs */
+/* Sleek Tabs */
 .stTabs [data-baseweb="tab-list"] {
     gap: 10px;
     background-color: #ffffff;
@@ -87,7 +87,7 @@ h1 {
     border-bottom: 3px solid #3B82F6;
 }
 
-/* 6. Pulsing Animated Download Button */
+/* Pulsing Animated Download Button */
 @keyframes pulseGlow {
     0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
     70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
@@ -109,7 +109,7 @@ h1 {
     color: white;
 }
 
-/* 7. Subtle Sidebar Styling */
+/* Subtle Sidebar Styling */
 [data-testid="stSidebar"] {
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(15px);
@@ -129,25 +129,29 @@ def run_streamlit():
     st.markdown("##### *Smart Matching • Automated Analysis • Audit Ready*")
     st.write("---")
 
-    # Sidebar
+    # Sidebar (Now only for Settings)
     with st.sidebar:
         st.header("⚙️ Configuration")
-        st.markdown("Adjust your matching parameters and upload ledgers.")
-        
+        st.markdown("Adjust your matching parameters below.")
         threshold = st.slider("Fuzzy Matching Threshold", 70, 100, 85, help="Higher values require stricter text matches.")
+
+    # Main Area: File Uploaders Side-by-Side
+    st.markdown("### 📥 Upload Datasets")
+    upload_col1, upload_col2 = st.columns(2)
+    
+    with upload_col1:
+        file_a = st.file_uploader("Upload Company A Ledger 📄", type=["xlsx"])
+    with upload_col2:
+        file_b = st.file_uploader("Upload Company B Ledger 📄", type=["xlsx"])
         
-        st.divider()
-        st.subheader("📁 Upload Files")
-        file_a = st.file_uploader("Upload Company A Ledger", type=["xlsx"])
-        file_b = st.file_uploader("Upload Company B Ledger", type=["xlsx"])
+    st.write("---")
 
     # Main Area Logic
     if not file_a or not file_b:
-        # Empty State Welcome Screen (Wrapped in a card-like container)
+        # Empty State Welcome Screen
         with st.container():
-            st.info("👋 **Welcome to Recon-X!** Please upload both Company A and Company B Excel files in the sidebar to initiate the reconciliation engine.")
-            # Optional placeholder for visual balance
-            st.markdown("<div style='height: 40vh;'></div>", unsafe_allow_html=True)
+            st.info("👋 **Welcome to Recon-X!** Please upload both Company A and Company B Excel files above to initiate the reconciliation engine.")
+            st.markdown("<div style='height: 20vh;'></div>", unsafe_allow_html=True)
         
     else:
         # Simulated Processing Animation with Progress Bar
