@@ -108,13 +108,6 @@ h1 {
     transform: translateY(-2px) scale(1.05);
     color: white;
 }
-
-/* Subtle Sidebar Styling */
-[data-testid="stSidebar"] {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(15px);
-    border-right: 1px solid rgba(0,0,0,0.05);
-}
 </style>
 """, unsafe_allow_html=True)
 
@@ -129,16 +122,15 @@ def run_streamlit():
     st.markdown("##### *Smart Matching • Automated Analysis • Audit Ready*")
     st.write("---")
 
-    # Sidebar (Now only for Settings)
-    #with st.sidebar:
-        #st.header("⚙️ Configuration")
-        #st.markdown("Adjust your matching parameters below.")
-        #threshold = st.slider("Fuzzy Matching Threshold", 70, 100, 85, help="Higher values require stricter text matches.")
-
-    # Main Area: File Uploaders Side-by-Side
-    st.markdown("### 📥 Upload Datasets")
-    upload_col1, upload_col2 = st.columns(2)
+    # Configuration & Uploads Area (Sidebar Removed completely)
+    st.markdown("### ⚙️ Configuration & Uploads")
     
+    # Threshold slider is now safely defined in the main flow
+    threshold = st.slider("Fuzzy Matching Threshold", 70, 100, 85, help="Higher values require stricter text matches.")
+    
+    st.markdown("<br>", unsafe_allow_html=True) # Little spacing
+    
+    upload_col1, upload_col2 = st.columns(2)
     with upload_col1:
         file_a = st.file_uploader("Upload Company A Ledger 📄", type=["xlsx"])
     with upload_col2:
@@ -150,7 +142,7 @@ def run_streamlit():
     if not file_a or not file_b:
         # Empty State Welcome Screen
         with st.container():
-            st.info("👋 **Welcome to Recon-X!** Please upload both Company A and Company B Excel files above to initiate the reconciliation engine.")
+            st.info("👋 **Welcome to Recon-X!** Please adjust your threshold and upload both Excel files above to initiate the reconciliation engine.")
             st.markdown("<div style='height: 20vh;'></div>", unsafe_allow_html=True)
         
     else:
